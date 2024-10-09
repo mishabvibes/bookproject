@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@500&display=swap');
+
+    body {
+        background-color: #E7E9F5;
+        font-family: 'Heebo', sans-serif;
+    }
+
+    .card {
+        width: 500px;
+        border: none;
+        border-radius: 20px;
+    }
+
+    .form-control {
+        border-radius: 7px;
+        border: 1.5px solid #E3E6ED;
+    }
+
+    input.form-control:focus {
+        box-shadow: none;
+        border: 1.5px solid #E3E6ED;
+        background-color: #F7F8FD;
+        letter-spacing: 1px;
+    }
+
+    .btn-primary {
+        background-color: #5878FF !important;
+        border-radius: 7px;
+    }
+
+    .btn-primary:focus {
+        box-shadow: none;
+    }
+
+    .text {
+        font-size: 13px;
+        color: #9CA1A4;
+    }
+
+    .price {
+        background: #F5F8FD;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+        width: 97px;
+    }
+
+    .flex-row {
+        border: 1px solid #F2F2F4;
+        border-radius: 10px;
+        margin: 0 1px 0;
+    }
+
+    .flex-column p {
+        font-size: 14px;
+    }
+
+    span.mb-2 {
+        font-size: 12px;
+        color: #8896BD;
+    }
+
+    h5 span {
+        color: #869099;
+    }
+
+    .fixed-button {
+        width: 200px;
+        /* Set the button to a fixed width */
+        text-align: center;
+        /* Center the button text */
+        white-space: nowrap;
+        /* Prevent text from wrapping */
+    }
+
+
+    @media screen and (max-width: 450px) {
+        .card {
+            display: flex;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .price {
+            border: none;
+            margin: 0 auto;
+        }
+    }
+</style>
+
+<body class="userappbody">
+    <ul class="nav justify-content-end nav-underline px-4 py-2">
+        {% if request.session.username %}
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">{{ request.session.username }}</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="{% url 'viewcart' %}">View Cart</a>
+            </li>
+            <li class="nav-item">
+                <a class="btn btn-outline-danger" href="{% url 'logout' %}">Logout</a>
+            </li>
+        {% endif %}
+    </ul>
+    
+
+    <div class="container d-flex justify-content-center">
+        <div class="card mt-5 p-4">
+            <form class="input-group mb-3" method="get" action="{% url 'usersearch' %}">
+                <input type="text" name="q" placeholder="Search" title="Search Book" class="form-control">
+                <div class="input-group-append"><button type="submit" title="Search" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
+            
+            <span class="text mb-4">88 branding projects</span>
+
+            {% for book in page %}
+            <div
+                class="d-flex flex-row justify-content-between align-items-center book-item mb-4 p-3 border rounded shadow-sm bg-light">
+                <!-- Left section: Book details -->
+                <div class="d-flex flex-column">
+                    <h5 class="book-title font-weight-bold mb-1">{{ book.title }}</h5>
+                    <small class="text-muted">by {{ book.author }}</small>
+                    <div class="d-flex mt-3">
+                        <a href="{% url 'userdetailbook' book.id %}" class="btn btn-primary py-2 px-4 me-2">View Details</a>
+                        <a href="{% url 'addtocart' book.id %}" class="btn btn-warning py-2 px-4">Add to cart</a>
+                    </div>
+                </div>
+                
+
+                <!-- Right section: Price details -->
+                <div class="price text-right">
+                    <span class="badge badge-success py-2 px-0 mb-2">Qua {{ book.quantity }}</span>
+                    <h5 class="price-amount mb-0"><span>&dollar;</span>{{ book.price }}</h5>
+                </div>
+            </div>
+            
+            {% endfor %}
+
+            {% block content %}
+            {% endblock %}
+            <!-- Pagination -->
+
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+
+                    {% if page.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page.previous_page_number }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page.paginator.page_range %}
+                    <li class="page-item {% if page.number == num %}activate{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if page.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page.next_page_number }}">Next</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <!-- <div class="d-flex flex-row justify-content-between mx-1">
+                <div class="d-flex flex-column p-3"><p class="mb-1">Need to create brand guidelines for my brand</p> <small class="text-muted">12 days remaining</small>
+                </div>
+                <div class="price pt-3 pl-3">
+                    <span class="mb-2">Hourly</span>
+                    <h5><span>&dollar;</span>40</h5>
+                </div>
+            </div> -->
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</body>
+
+</html>

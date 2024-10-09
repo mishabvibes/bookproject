@@ -1,0 +1,47 @@
+{% extends 'user/index.html' %} {% load static %} {% block content %}
+
+{% if books %}
+{% for book in books %}
+
+<div
+    class="d-flex flex-row justify-content-between align-items-center book-item mb-4 p-3 border rounded shadow-sm bg-light">
+    <!-- Left section: Book details -->
+    <div class="d-flex flex-column">
+        <h5 class="book-title font-weight-bold mb-1">{{ book.title }}</h5>
+        <small class="text-muted">by {{ book.author }}</small>
+        <a href="{% url 'userdetailbook' book.id %}" class="btn btn-primary mt-3 py-2 px-4 fixed-button">View
+            Details</a>
+    </div>
+
+    <!-- Right section: Price details -->
+    <div class="price text-right">
+        <span class="badge badge-success py-2 px-0 mb-2">Fixed Price</span>
+        <h5 class="price-amount mb-0"><span>&dollar;</span>{{ book.price }}</h5>
+    </div>
+</div>
+
+{% endfor %}
+{% endif %}
+
+
+<!-- Pagination -->
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+  
+      {% if page.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ page.previous_page_number }}">Previous</a></li>
+      {% endif %}
+  
+      {% for num in page.paginator.page_range %}
+      <li class="page-item {% if page.number == num %}activate{% endif %}">
+        <a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+      {% endfor %}
+  
+      {% if page.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ page.next_page_number }}">Next</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+
+{% endblock %}
